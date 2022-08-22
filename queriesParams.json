@@ -1,0 +1,89 @@
+{
+	"WARNING!!" : "Favor no modificar este archivo a no ser que tenga muy claro su uso !!!",
+
+	"options1" : "set SYNC_DDL=1" ,
+
+	"fromCSV1" : "CREATE EXTERNAL TABLE {0} LIKE PARQUET '{1}file.parq' STORED AS PARQUET LOCATION '{1}'" ,
+
+	"getBigDataFrame1" : "SET NUM_NODES = 1 " ,
+	"getBigDataFrame2" : "set PARQUET_FILE_SIZE = {0}g " ,
+	"getBigDataFrame3" : "create table {0} stored as parquet as {1}"  ,
+	"getBigDataFrame4" : "SET NUM_NODES = 0"  ,
+	"getBigDataFrame5" : "show files in "  ,
+
+	"drop1" : "drop table if exists {0} purge"  ,
+
+	"count1" : "select count(*) from {0}"  ,
+
+	"describe1" : "describe {0} "  ,
+	"describe2" : "describe formatted {0} "  ,
+
+	"compute1" : "compute stats {0}"  ,
+
+	"oneHot1" : " select distinct trim(cast({0} as string)) from {1} order by trim(cast({0} as string)) " , 
+	"oneHot2" : " create table {0}_ohe stored as parquet as \nSelect {1} , \n " ,
+	"oneHot3" : " case when trim(cast({0} as string)) = '{1}' then 1 else 0 end as {2} \n" ,
+	"oneHot4" : " drop table if exists {0}_ohe purge" ,
+	"oneHot5" : " compute stats {0}_ohe " ,
+
+	"transpose1" : "select distinct {0} from {1} order by {0}" ,
+	"transpose2" : "create table {0}_trans stored as parquet as \n Select {1} , \n " ,
+	"transpose3" : "\tsum( case when {0} = {1} then {2} end) as {3} \n" ,
+	"transpose4" : "FROM {0} \nGROUP BY {1}" ,
+	"transpose5" : "drop table if exists {0}_trans purge" ,
+	"transpose6" : "compute stats {0}_trans " ,
+
+	"recreate1" : "drop table if exists proceso.{0} purge" ,
+	"recreate2" : "create table proceso.{0} stored as parquet as select * from {0}" ,
+	"recreate3" : "drop table if exists {0} purge" ,
+	"recreate4" : "create table {0} stored as parquet as select * from proceso.{1} " ,
+	"recreate5" : "compute stats {0} " ,
+
+	"muestraAleatoria1" : "create table {0}_muestra stored as parquet as with  tot as (  select count(*) as total_tabla from {0}  ) , b1 as ( select * , row_number() over (order by random()) as rn_rand_muestra  from {0} ) select {1} from b1 t join tot x on 1 = 1 where t.rn_rand_muestra/x.total_tabla <= {2} " ,
+
+	"muestraEstratificada1" : "create table {0}_muestra_est stored as parquet as with tot as ( select {1} , count(*) as total_estrato from {0} group by {1} ) , b1 as ( select * , row_number()   over (partition by {1} order by random()) as rn_rand_muestra from {0} ) select {2}  from b1 t join tot x on {3} where t.rn_rand_muestra/x.total_estrato <= {4}  or  t.rn_rand_muestra <= 1 " ,
+
+	"tableSize1" : "show files in " ,
+
+	"enmascarar1" : " create table {0}_mask stored as parquet as select {1} from {0} " ,
+
+	"enmascararLg1" : " create table {0}_{1}_truth stored as parquet as with base as ( select distinct {0} from {1} ) select * , row_number() over ( order by random() ) as new_{0} from base " ,
+	"enmascararLg2" : " create table {0}_{1}_truth stored as parquet as with b1 as ( select distinct {0} from {1} ) , b2 as ( select {0} , cast(row_number() over (order by rand()) as string) as ncb from b1 ) select {0} , ncb as new_{0} from b2 " ,
+	"enmascararLg3" : " create table {0}_mask stored as parquet as select {1} from {0} x left join {2} " ,
+
+    "**********************************" : "********************************",
+
+	"queriesEstabilidadVariables" : "WARN: Mucho cuidado" ,
+
+	"missing1"  : "create table {0}_miss stored as parquet as with pers as ( select {1} , count(*) as ecp_j6Q1npKo5L from {0} t group by {1} ) select {1} {2} from {0} t join pers p on {3} group by {1} , ecp_j6Q1npKo5L" ,
+	"missing2"  : " \n , sum(case when {0} is null then 1 else 0 end)/ecp_j6Q1npKo5L as {0}_miss " ,
+
+	"averages1" : "create table {0}_av stored as parquet as select {1} {2} from {0} group by {1}" ,
+	"averages2" : " \n , avg({0}) as {0}_av " ,
+
+	"medians1" : "create table {0}_med stored as parquet as select {1} {2} from {0} group by {1}" ,
+	"medians2" : " \n , appx_median({0}) as {0}_med " ,
+
+	"totals1" : " create table {0}_full stored as parquet as  select {1} from {0} " ,
+	"totals2" : "\n avg({0}) as {0}_av" ,
+	"totals3" : "\n appx_median({0}) as {0}_med" ,
+	"totals4" : "\n stddev({0}) as {0}_de" ,
+	"totals5" : "\n avg(case when {0} is null then 1 else 0 end) as {0}_miss \n" ,
+
+	"limiteControl1" : " , case when m.{0}_{3} < (f.{0}_av - {1}*({0}_de/sqrt({2}))) or m.{0}_{3} > (f.{0}_av + {1}*({0}_de/sqrt({2}))) then 1 else 0 end as {0} " ,
+	"limiteControl2" : " create table {0}_lcm_{3}_{4} stored as parquet as  select {1} {2} from {0}_{4} m join {0}_full f on 1 = 1 " ,
+
+	"completitud1" : "   , case when m.{0}_miss < (f.{0}_miss - {1}*sqrt((f.{0}_miss*(1-f.{0}_miss))/{2} )) or m.{0}_miss > (f.{0}_miss + {1}*sqrt((f.{0}_miss*(1-f.{0}_miss))/{2} )) then 1 else 0 end as {0} " ,
+	"completitud2" : " create table {0}_comp_{3} stored as parquet as  select {1} {2} from {0}_miss m join {0}_full f on 1 = 1 " ,
+
+	"alertaPeriodo1" : "\n  {0} as ( select {1} , {2} as suma from {3}  ) " ,
+	"alertaPeriodo2" : "  from lcm_90_med l90_med  join lcm_90_av l90_av on   {l90_av} join lcm_95_med l95_med on {l95_med}  join lcm_95_av l95_av on   {l95_av}  join lcm_99_med l99_med on {l99_med}  join lcm_99_av l99_av on   {l99_av}  join comp_90 c90 on     {c90} join comp_95 c95 on     {c95} join comp_99 c99 on     {c99} " ,
+	"alertaPeriodo3" : " create table {0}_alerta stored as parquet as  with  {1}  select  {2} , l90_med.suma as l90_med   , l90_av.suma as l90_av   , l95_med.suma as l95_med   , l95_av.suma as l95_av     , l99_med.suma as l99_med   , l99_av.suma as l99_av  , c90.suma as c90   , c95.suma as c95   , c99.suma as c99  {3}  " ,
+
+	"getSize1" : "select count(*) as n from {0}_miss" ,
+	"baseForAlerta1" : "select * from {0} order by {1}" ,
+
+	"baseVarNtile1" : "with b as (  select {0} , ntile(100) over (order by {0}) as nt  from {1}  where {0} is not null  ) , a as (  select * , row_number() over (partition by nt order by {0} desc) as rn  from b  ) , tot as (  select min({0}) as min   , max({0}) as max   from {1}  ) , c as ( select * from a where rn = 1 )  select   '{0}' as variable  , round({0}_miss , 3) as pmiss  , min  , sum(case when nt = 1  then {0} else 0 end) as p1  , sum(case when nt = 10 then {0} else 0 end) as p10  , sum(case when nt = 25 then {0} else 0 end) as p25  , sum(case when nt = 50 then {0} else 0 end) as p50  , sum(case when nt = 75 then {0} else 0 end) as p75  , sum(case when nt = 90 then {0} else 0 end) as p90  , sum(case when nt = 99 then {0} else 0 end) as p99  , max  from c  join tot on 1 = 1  join {1}_full on 1 = 1  group by 1 , 2 , min , max " ,
+
+	"********************************" : "********************************"
+}
